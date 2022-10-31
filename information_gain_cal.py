@@ -160,13 +160,15 @@ y = train_set[y_name].to_numpy()
 results = pd.DataFrame(columns= ['Credit_Amt', 'number_of_Credit', 'new sam 0', 'new sam 1','information gain', 'recall', 'filter rate'])
 
 for i in tqdm(range(len(x))):
-    for j in range(len(y)):
-        new_sam_0, new_sam_1, information_gain = InformationGain(x[i], y[j], x_name, y_name, train_set)
-        recall, filter_rate = RecallFilterRate(x[i], y[j], x_name, y_name, train_set)
+    #for j in range(len(y)):
+        new_sam_0, new_sam_1, information_gain = InformationGain(x[i], y[i], x_name, y_name, train_set)
+        recall, filter_rate = RecallFilterRate(x[i], y[i], x_name, y_name, train_set)
 
-        tmp = pd.DataFrame({'Credit_Amt': [x[i]], 'number_of_Credit': [y[j]], \
+        tmp = pd.DataFrame({'Credit_Amt': [x[i]], 'number_of_Credit': [y[i]], \
                 'information gain': information_gain, 'new sam 0': new_sam_0, 'new sam 1': new_sam_1, 'recall': recall, 'filter rate': filter_rate})
 
         results = pd.concat([results, tmp], axis= 0, ignore_index= True)
 
-print(results.shape)
+        print(results.shape)
+
+results.to_csv('credit_information_gain.csv', index= False)
