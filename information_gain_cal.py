@@ -100,7 +100,7 @@ def InformationGain(x_thre, y_thre, x_name, y_name, data):
     idx1 = set(data[data[x_name] >= x_thre].index)
     idx2 = set(data[data[y_name] >= y_thre].index)
     idx = list(idx1 & idx2)
-    
+
     new_sam_1 = data.iloc[idx]
     new_sam_0 = data.drop(index= new_sam_1.index)
 
@@ -158,21 +158,20 @@ y_name = 'number_of_Credit'
 # x = train_set[x_name].to_numpy()
 # y = train_set[y_name].to_numpy()
 
+train_set = train_set.dropna(subset= ['Credit_Amt', 'number_of_Credit', 'Debit_Amt', 'number_of_Debit']).reset_index(drop= True)
+test_set = test_set.dropna(subset= ['Credit_Amt', 'number_of_Credit', 'Debit_Amt', 'number_of_Debit']).reset_index(drop= True)
+
 x = np.unique(train_set['Credit_Amt'])
-x = np.linspace(x[0], x[-1], 1000)
 y = np.unique(train_set['number_of_Credit'])
-y = np.linspace(y[0], y[-1], 1000)
-x, y = np.meshgrid(x, y)
 
 results = pd.DataFrame(columns= ['Credit_Amt', 'number_of_Credit', 'new sam 0', 'new sam 1','information gain', 'recall', 'filter rate'])
 
-for i in tqdm(range(x.shape[0])):
-    for j in range(x.shape[1]):
-    #for j in range(len(y)):
-        new_sam_0, new_sam_1, information_gain = InformationGain(x[i][j], y[i][j], x_name, y_name, train_set)
-        recall, filter_rate = RecallFilterRate(x[i][j], y[i][j], x_name, y_name, train_set)
+for i in tqdm(range(len(x))):
+    for j in range((len(y))):
+        new_sam_0, new_sam_1, information_gain = InformationGain(x[i], y[j], x_name, y_name, train_set)
+        recall, filter_rate = RecallFilterRate(x[i], y[j], x_name, y_name, train_set)
 
-        tmp = pd.DataFrame({'Credit_Amt': [x[i][j]], 'number_of_Credit': [y[i][j]], \
+        tmp = pd.DataFrame({'Credit_Amt': [x[i]], 'number_of_Credit': [y[j]], \
                 'information gain': information_gain, 'new sam 0': new_sam_0, 'new sam 1': new_sam_1, 'recall': recall, 'filter rate': filter_rate})
 
         results = pd.concat([results, tmp], axis= 0, ignore_index= True)
