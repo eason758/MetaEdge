@@ -109,18 +109,6 @@ def InformationGain(x_thre, y_thre, x_name, y_name, data):
     
     condition_entropy = ConditionEntropy(new_sam_0, new_sam_1)
     IG = -(father_entropy - condition_entropy)
-    return len(new_sam_0), len(new_sam_1), IG
-
-def RecallFilterRate(x_thre, y_thre, x_name, y_name, data):
-    idx1 = set(data[data[x_name] >= x_thre].index)
-    idx2 = set(data[data[y_name] >= x_thre].index)
-    idx = list(idx1 & idx2)
-    
-    new_sam_1 = data.iloc[idx]
-    new_sam_0 = data.drop(index= new_sam_1.index)
-
-    if len(set(new_sam_1.index) & set(new_sam_0.index)) != 0:
-        raise ValueError('new sam 0 and new sam 1 are overlapped!')
 
     TP = new_sam_1[new_sam_1[SAR_type] != 0].shape[0]
     TN = new_sam_0[new_sam_0[SAR_type] == 0].shape[0]
@@ -130,7 +118,8 @@ def RecallFilterRate(x_thre, y_thre, x_name, y_name, data):
     recall = TP / (TP + FN)
     filter_rate = (TN + FN) / (TP + TN + FP + FN)
 
-    return recall, filter_rate
+
+    return len(new_sam_0), len(new_sam_1), IG, recall, filter_rate
 
 '''
 main function
@@ -168,8 +157,7 @@ results = pd.DataFrame(columns= ['Credit_Amt', 'number_of_Credit', 'new sam 0', 
 
 for i in tqdm(range(len(x))):
     for j in range((len(y))):
-        new_sam_0, new_sam_1, information_gain = InformationGain(x[i], y[j], x_name, y_name, train_set)
-        recall, filter_rate = RecallFilterRate(x[i], y[j], x_name, y_name, train_set)
+        new_sam_0, new_sam_1, information_gain, recall, filter_rate = InformationGain(x[i], y[j], x_name, y_name, train_set)
 
         tmp = pd.DataFrame({'Credit_Amt': [x[i]], 'number_of_Credit': [y[j]], \
                 'information gain': information_gain, 'new sam 0': new_sam_0, 'new sam 1': new_sam_1, 'recall': recall, 'filter rate': filter_rate})
